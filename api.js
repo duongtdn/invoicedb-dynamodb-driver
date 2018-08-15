@@ -77,26 +77,20 @@ const db = {
 
   },
 
-
-  createInvoice( invoice, done) {
-    if (!invoice) {
-      done && done(null, null)
+  createMasterRecord(done) {
+    const invoice = {
+      number: 'M-1111', 
+      issueAt: new Date(),
+      y18: {
+        m8: { cnt: 100 }
+      }
     }
-
-    const now = new Date();
-    invoice.createdAt = now.getTime();
-    invoice.status = 'active'
-
-    // create unique Invoice number
-    const yy = String(now.getFullYear()).slice(-2);
-    const mm = now.getMonth() + 1;
-    const num = 1;
-
+    
     const params = {
       TableName: table,
       Item: invoice
     };
-    
+
     const docClient = new AWS.DynamoDB.DocumentClient();
     docClient.put(params, (err, data) => {
       if (err) {
@@ -105,6 +99,82 @@ const db = {
         done && done();
       }
     });
+  },
+
+  async createInvoice( invoice, done) {
+    if (!invoice) {
+      done && done(null, null)
+    }
+
+    const now = new Date();
+    invoice.issueAt = now.getTime();
+    invoice.status = 'active'
+
+    // prepare unique Invoice number
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = now.getMonth() + 1;
+    invoice.number = `${yy}-${mm}-`;
+
+    // register invoice to master record and get number
+    try {
+      const cnt = await this._getInvoiceNumber(now);
+      invoice.number += String(cnt).padStart(5,0);
+    } catch (err) {
+      done && done(err, null)
+    }
+   
+    // write invoice into db
+    try {
+      await this._writeInvoiceToDb(invoice);
+      done && done (null, invoice);
+    } catch (err) {
+      done && done(err, null)
+    }
+
+  },
+
+  _getInvoiceNumber(now) {
+    const yy = String(now.getFullYear()).slice(-2);
+    const mm = now.getMonth() + 1;
+    const params = {
+      TableName: table,
+      Key: { number: 'M-1111'},
+      UpdateExpression: `set y${yy}.m${mm}.cnt = y${yy}.m${mm}.cnt + :val`,
+      ExpressionAttributeValues:{
+        ":val": 1
+      },
+      ReturnValues:"UPDATED_NEW"
+    };
+
+    return new Promise((resolve, reject) => {
+      const docClient = new AWS.DynamoDB.DocumentClient();
+      docClient.update(params, function(err, data) {
+        if (err) {
+          reject(err)
+        } else {
+          const cnt = data.Attributes[`y${yy}`][`m${mm}`].cnt
+          resolve(cnt)
+        }
+      });
+    })
+
+  },
+
+  _writeInvoiceToDb(invoice) {
+    const params = {
+      TableName: table,
+      Item: invoice
+    };
+    return new Promise((resolve, reject) => {
+      const docClient = new AWS.DynamoDB.DocumentClient();
+      docClient.put(params, (err, data) => {
+        if (err) {
+          reject(err);
+        } else {
+          resolve(data);
+        }
+      });
+    })
   },
 
   updateInvoice( invoice, done) {
