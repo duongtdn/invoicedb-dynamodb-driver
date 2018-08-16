@@ -82,7 +82,7 @@ const db = {
       number: 'M-1111', 
       issueAt: new Date(),
       y18: {
-        m8: { cnt: 100 }
+        m8: { cnt: 10 }
       }
     }
     
@@ -112,13 +112,13 @@ const db = {
 
     // prepare unique Invoice number
     const yy = String(now.getFullYear()).slice(-2);
-    const mm = now.getMonth() + 1;
-    invoice.number = `${yy}-${mm}-`;
+    const mm = String(now.getMonth() + 1).padStart(2,0);
+    invoice.number = `${yy}${mm}`;
 
     // register invoice to master record and get number
     try {
       const cnt = await this._getInvoiceNumber(now);
-      invoice.number += String(cnt).padStart(5,0);
+      invoice.number += String(cnt).padStart(4,0);
     } catch (err) {
       done && done(err, null)
     }
