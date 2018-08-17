@@ -108,7 +108,7 @@ const db = {
 
     const now = new Date();
     invoice.issueAt = now.getTime();
-    invoice.status = 'active'
+    invoice.status = 'billing'
 
     // prepare unique Invoice number
     const yy = String(now.getFullYear()).slice(-2);
