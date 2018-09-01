@@ -124,7 +124,7 @@ const db = {
     // register invoice to master record and get number
     try {
       const cnt = await this._getInvoiceNumber(now);
-      invoice.number += String(cnt).padStart(4,0);
+      invoice.number += String(cnt).padStart(3,0);
     } catch (err) {
       done && done(err, null);
       return
