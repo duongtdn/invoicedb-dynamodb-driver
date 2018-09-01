@@ -81,11 +81,16 @@ const db = {
     const invoice = {
       number: 'M-1111', 
       issueAt: new Date(),
-      y18: {
-        m8: { cnt: 10 }
+    }
+
+    for (let y = 18; y < 20; y++) {
+      invoice[`y${y}`] = {};
+      const yr = invoice[`y${y}`];
+      for (let m = 1; m < 13; m++) {
+        yr[`m${m}`] = { cnt: 10}
       }
     }
-    
+
     const params = {
       TableName: table,
       Item: invoice
