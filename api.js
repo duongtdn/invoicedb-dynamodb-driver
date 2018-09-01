@@ -103,7 +103,8 @@ const db = {
 
   async createInvoice( invoice, done) {
     if (!invoice) {
-      done && done(null, null)
+      done && done(null, null);
+      return
     }
 
     const now = new Date();
@@ -120,7 +121,8 @@ const db = {
       const cnt = await this._getInvoiceNumber(now);
       invoice.number += String(cnt).padStart(4,0);
     } catch (err) {
-      done && done(err, null)
+      done && done(err, null);
+      return
     }
    
     // write invoice into db
@@ -128,7 +130,8 @@ const db = {
       await this._writeInvoiceToDb(invoice);
       done && done (null, invoice);
     } catch (err) {
-      done && done(err, null)
+      done && done(err, null);
+      return
     }
 
   },
