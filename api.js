@@ -77,6 +77,27 @@ const db = {
 
   },
 
+  batchGetInvoices(invoiceNums, done) {
+    const param = { RequestItems: {} };
+    
+    param.RequestItems[table] = { Keys: [] };
+    invoiceNums.forEach( id => {
+      param.RequestItems[table].Keys.push({ 'number' :id })
+    })
+    param.RequestItems[table].AttributesToGet = ['number', 'subTotal', 'items', 'issueAt']; // option (attributes to retrieve from this table)
+    param.RequestItems[table].ConsistentRead = false; // optional (true | false)
+
+    param.ReturnConsumedCapacity = 'NONE'; // optional (NONE | TOTAL | INDEXES)
+    const docClient = new AWS.DynamoDB.DocumentClient();
+    docClient.batchGet(param, (err, data) => {
+      if (err) {
+        done && done(err, null)
+      } else {
+        done && done(null, data.Responses[table])
+      }
+    })
+  },
+
   createMasterRecord(done) {
     const invoice = {
       number: 'M-1111', 
