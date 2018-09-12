@@ -7,15 +7,30 @@ let dynamodb = null
 const invoiceDB = {}
 
 const table = 'INVOICE';
+const gsIndex = 'INVOICE_BY_STATUS';
 
 const Invoice = {
-  TableName : "INVOICE",
+  TableName : table,
   KeySchema: [       
     { AttributeName: "number", KeyType: "HASH" }
   ],
   AttributeDefinitions: [       
-    { AttributeName: "number", AttributeType: "S" }
+    { AttributeName: "number", AttributeType: "S" },
+    { AttributeName: "status", AttributeType: "S" }
   ],
+  GlobalSecondaryIndexes: [{
+    IndexName: gsIndex,
+    KeySchema: [
+      { AttributeName: "status", KeyType: "HASH"},     
+    ],
+    Projection: {
+        ProjectionType: "ALL"
+    },
+    ProvisionedThroughput: {
+        ReadCapacityUnits: 1,
+        WriteCapacityUnits: 1
+    }
+  }],
   ProvisionedThroughput: {       
       ReadCapacityUnits: 1, 
       WriteCapacityUnits: 1
@@ -96,6 +111,37 @@ const db = {
         done && done(null, data.Responses[table])
       }
     })
+  },
+
+  queryInvoicesByStatus({status}, done) {
+
+    const params = {
+      TableName: table, 
+      IndexName: gsIndex,
+      KeyConditionExpression: `#status = :stt`,
+      ExpressionAttributeNames: { 
+        "#status": "status" 
+      },
+      ExpressionAttributeValues: {
+        ':stt' : status
+      } 
+    }
+
+    const docClient = new AWS.DynamoDB.DocumentClient();
+    docClient.query(params,
+      (err, data) => {
+        if (err) { done({error:err}, null) }
+        else {
+          if (data && data.Items && data.Items.length > 0) {
+            done && done(null, data.Items)
+          } else {
+            done && done(null, null)
+          }
+        }
+        
+      }
+    );
+
   },
 
   createMasterRecord(done) {
