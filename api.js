@@ -252,8 +252,28 @@ const db = {
     })
   },
 
-  updateInvoice( invoice, done) {
-    
+  resolve( {updatedBy, number, status}, done) {
+    const now = new Date();
+    const d = now.getTime();
+
+    const params = {
+      TableName: table,
+      Key: {
+        number: number
+      },
+      UpdateExpression: `set #status = :s, resolvedBy = :u, resolvedAt = :d`,
+      ExpressionAttributeNames: { 
+        "#status": "status" 
+      },
+      ExpressionAttributeValues: {
+        ":s": status,
+        ":u": updatedBy,
+        ":d": d
+      }
+    }
+
+    const docClient = new AWS.DynamoDB.DocumentClient();
+    docClient.update(params, done)
   },
 
 }
