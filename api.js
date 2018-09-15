@@ -99,7 +99,7 @@ const db = {
     invoiceNums.forEach( id => {
       param.RequestItems[table].Keys.push({ 'number' :id })
     })
-    // param.RequestItems[table].AttributesToGet = ['number', 'subTotal', 'items', 'issueAt']; // option (attributes to retrieve from this table)
+    param.RequestItems[table].AttributesToGet = ['number', 'subTotal', 'items', 'issueAt']; // option (attributes to retrieve from this table)
     param.RequestItems[table].ConsistentRead = false; // optional (true | false)
 
     param.ReturnConsumedCapacity = 'NONE'; // optional (NONE | TOTAL | INDEXES)
