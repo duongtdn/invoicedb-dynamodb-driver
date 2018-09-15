@@ -99,7 +99,7 @@ const db = {
     invoiceNums.forEach( id => {
       param.RequestItems[table].Keys.push({ 'number' :id })
     })
-    param.RequestItems[table].AttributesToGet = ['number', 'subTotal', 'items', 'issueAt']; // option (attributes to retrieve from this table)
+    // param.RequestItems[table].AttributesToGet = ['number', 'subTotal', 'items', 'issueAt']; // option (attributes to retrieve from this table)
     param.RequestItems[table].ConsistentRead = false; // optional (true | false)
 
     param.ReturnConsumedCapacity = 'NONE'; // optional (NONE | TOTAL | INDEXES)
@@ -252,23 +252,29 @@ const db = {
     })
   },
 
-  resolve( {updatedBy, number, status}, done) {
+  resolve( {updatedBy, number, comment, status}, done) {
     const now = new Date();
     const d = now.getTime();
+
+    if (!comment || comment.length === 0) {
+      comment = 'n/a'
+    }
 
     const params = {
       TableName: table,
       Key: {
         number: number
       },
-      UpdateExpression: `set #status = :s, resolvedBy = :u, resolvedAt = :d`,
+      UpdateExpression: `set #status = :s, resolvedBy = :u, resolvedAt = :d, #comment = :c`,
       ExpressionAttributeNames: { 
-        "#status": "status" 
+        "#status": "status",
+        "#comment": "comment"
       },
       ExpressionAttributeValues: {
         ":s": status,
         ":u": updatedBy,
-        ":d": d
+        ":d": d,
+        ":c": comment
       }
     }
 
