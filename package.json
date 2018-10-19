@@ -1,5 +1,5 @@
 {
-  "name": "invoicedb-dynamodb-driver",
+  "name": "@sglearn/invoicedb-dynamodb-driver",
   "version": "1.0.0",
   "description": "dynamodb driver for invoice database",
   "main": "api.js",
@@ -8,14 +8,14 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/duongtdn/invoicedb-dynamodb-driver.git"
+    "url": "git+https://github.com/sglearn/invoicedb-dynamodb-driver.git"
   },
   "author": "duongtdn",
   "license": "MIT",
   "bugs": {
-    "url": "https://github.com/duongtdn/invoicedb-dynamodb-driver/issues"
+    "url": "https://github.com/sglearn/invoicedb-dynamodb-driver/issues"
   },
-  "homepage": "https://github.com/duongtdn/invoicedb-dynamodb-driver#readme",
+  "homepage": "https://github.com/sglearn/invoicedb-dynamodb-driver#readme",
   "dependencies": {
     "aws-sdk": "^2.240.1"
   }
