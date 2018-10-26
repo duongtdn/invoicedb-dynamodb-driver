@@ -252,12 +252,12 @@ const db = {
     })
   },
 
-  resolve( {updatedBy, number, comment, status}, done) {
+  resolve( {updatedBy, number, resolvedComment, status}, done) {
     const now = new Date();
     const d = now.getTime();
 
-    if (!comment || comment.length === 0) {
-      comment = 'n/a'
+    if (!resolvedComment || resolvedComment.length === 0) {
+      resolvedComment = 'n/a'
     }
 
     const params = {
@@ -265,16 +265,16 @@ const db = {
       Key: {
         number: number
       },
-      UpdateExpression: `set #status = :s, resolvedBy = :u, resolvedAt = :d, #comment = :c`,
+      UpdateExpression: `set #status = :s, resolvedBy = :u, resolvedAt = :d, #resolvedComment = :c`,
       ExpressionAttributeNames: { 
         "#status": "status",
-        "#comment": "comment"
+        "#resolvedComment": "resolvedComment"
       },
       ExpressionAttributeValues: {
         ":s": status,
         ":u": updatedBy,
         ":d": d,
-        ":c": comment
+        ":c": resolvedComment
       }
     }
 
